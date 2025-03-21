@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import mesh
+import os
 
 app = Flask(__name__)
 
@@ -31,4 +32,6 @@ def analyze_food():
     return jsonify({'response': response})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    # Use PORT environment variable for Render deployment, or 8080 for local development
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', debug=True, port=port)

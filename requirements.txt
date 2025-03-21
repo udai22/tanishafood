@@ -1,3 +1,3 @@
 flask==3.1.0
-mesh-sdk==1.4.14
+mesh-sdk==1.4.15
 gunicorn==21.2.0

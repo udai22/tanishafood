@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Metabolism Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #4a6fa5;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background-color: #4a6fa5;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #3a5a80;
+        }
+        #response-section {
+            display: none;
+            margin-top: 30px;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #4a6fa5;
+        }
+        #result-content {
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="text-center">Food Metabolism Analyzer</h1>
+            </div>
+            <div class="card-body p-4">
+                <p class="lead text-center mb-4">
+                    Enter what food you just ate and learn how your body processes it at a biochemical level.
+                </p>
+                
+                <form id="food-form">
+                    <div class="mb-3">
+                        <label for="food-input" class="form-label">What did you eat?</label>
+                        <input type="text" class="form-control" id="food-input" 
+                               placeholder="E.g., McDonald's Big Mac, grilled salmon, avocado toast..." required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Analyze Metabolism</button>
+                    </div>
+                </form>
+                
+                <div class="loader">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing your food's metabolic pathways...</p>
+                </div>
+                
+                <div id="response-section" class="card mt-4">
+                    <div class="card-header">
+                        <h3>Metabolic Analysis</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="result-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('food-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const foodInput = document.getElementById('food-input').value;
+            const loader = document.querySelector('.loader');
+            const responseSection = document.getElementById('response-section');
+            const resultContent = document.getElementById('result-content');
+            
+            // Show loader, hide previous results
+            loader.style.display = 'block';
+            responseSection.style.display = 'none';
+            
+            try {
+                const formData = new FormData();
+                formData.append('food', foodInput);
+                
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultContent.textContent = data.response;
+                    responseSection.style.display = 'block';
+                } else {
+                    resultContent.textContent = data.error || 'An error occurred while analyzing your food.';
+                    responseSection.style.display = 'block';
+                }
+            } catch (error) {
+                resultContent.textContent = 'An error occurred while connecting to the server.';
+                responseSection.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
